@@ -7,7 +7,8 @@ spec:
   deploymentstrategy: docker
   image:
     repository: calcom.docker.scarf.sh/calcom/cal.com
-    tag: latest
+    # not using latest until this is fixed https://github.com/calcom/docker/issues/379
+    tag: v4.5.1
     containerPort: "3000"
     run:
       securityContext:
@@ -38,12 +39,26 @@ spec:
               persistence:
                 size: 1Gi
   envVars:
+  - name: DATABASE_HOST_NAME
+    value: calcom-postgresql
+  - name: DATABASE_HOST_PORT
+    value: 5432
+  - name: DATABASE_HOST
+    value: $(DATABASE_HOST_NAME):$(DATABASE_HOST_PORT)
   - name: DATABASE_URL
-    value: postgresql://calcom:calcom@calcom-postgresql/postgresql
+    value: postgresql://calcom:calcom@$(DATABASE_HOST)/postgresql
+  - name: DATABASE_DIRECT_URL
+    value: $(DATABASE_URL)
   - name: NODE_ENV
     value: production
   - name: NEXT_PUBLIC_LICENSE_CONSENT
     value: agree
+  - name: NEXT_PUBLIC_API_V2_URL
+    value: http://localhost:5555/api/v2
+  - name: NEXT_PUBLIC_WEBAPP_URL
+    value: http://localhost:3000
+  - name: NEXT_PUBLIC_LOGGER_LEVEL
+    value: 2
   - name: NEXTAUTH_SECRET
     value: palimpalim
   - name: CALENDSO_ENCRYPTION_KEY
